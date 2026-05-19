@@ -138,6 +138,8 @@ or
 npx eas-cli build --platform android --profile preview
 ```
 
+> **Note:** Check `app.json`. If you find `projectId` and `owner`, remove them and log in with your own EAS account. These values are linked to the original Expo project and may cause build or deployment issues when using a different account.
+
 ### Production build
 
 ```bash
