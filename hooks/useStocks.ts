@@ -22,28 +22,32 @@ export const useStocks = () => {
 
   useEffect(() => {
     fetchStocks();
+  }, [fetchStocks]);
 
-    // Connect socket
+  useEffect(() => {
     socket.connect();
 
-    // Real time price updates
-    socket.on(
-      "price_update",
-      ({ symbol, price }: { symbol: string; price: number }) => {
-        setStocks((prev) =>
-          prev.map((stock) =>
-            stock.symbol === symbol ? { ...stock, price } : stock,
-          ),
-        );
-      },
-    );
+    const onPriceUpdate = ({
+      symbol,
+      price,
+    }: {
+      symbol: string;
+      price: number;
+    }) => {
+      setStocks((prevStocks) =>
+        prevStocks.map((stock) =>
+          stock.symbol === symbol ? { ...stock, price } : stock,
+        ),
+      );
+    };
 
-    // Cleanup and unmount
+    socket.on("price_update", onPriceUpdate);
+
     return () => {
-      socket.off("price_update");
+      socket.off("price_update", onPriceUpdate);
       socket.disconnect();
     };
-  }, [fetchStocks]);
+  }, []);
 
   return { stocks, loading, error, refetch: fetchStocks };
 };

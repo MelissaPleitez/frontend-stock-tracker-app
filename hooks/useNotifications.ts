@@ -1,7 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useState } from "react";
 import api from "../services/api";
-import socket from "../services/socket";
 import { InAppNotification, NotificationsResponse } from "../types";
 
 export const useNotifications = () => {
@@ -35,23 +33,8 @@ export const useNotifications = () => {
   useEffect(() => {
     fetchNotifications();
 
-    AsyncStorage.getItem("user").then((userStr) => {
-      if (!userStr) return;
-      const user = JSON.parse(userStr);
-      socket.on(`notification_${user.id}`, () => {
-        fetchNotifications();
-      });
-    });
-
-    const interval = setInterval(fetchNotifications, 10000);
-    return () => {
-      AsyncStorage.getItem("user").then((userStr) => {
-        if (!userStr) return;
-        const user = JSON.parse(userStr);
-        socket.off(`notification_${user.id}`);
-      });
-      clearInterval(interval);
-    };
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
   }, [fetchNotifications]);
 
   return {
